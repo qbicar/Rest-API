@@ -1,42 +1,29 @@
+'use strict';
+const Sequelize = require('sequelize')
+
+
 module.exports = (sequelize, DataTypes) => {
-  const Users = sequelize.define('User', {
+  const Users = sequelize.define('Users', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    first: {
+    firstName: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Please provide a value for 'Title'",
-        },
-        notEmpty: {
-          msg: "Please provide a value for 'Title'",
-        }
-      },
     },
-    author: {
+    lastName: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Please provide a value for 'Author'",
-        },
-        notEmpty: {
-          msg: "Please provide a value for 'Author'",
-        }
-      },
     },
-    genre: {
+    emailAddress: {
       type: DataTypes.STRING,
-      allowNull: false
     },
-    year: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    password: {
+      type: DataTypes.STRING,
     },
-  }, {});
-  return Book;
+  }, { sequelize });
+  Users.associate = (models) => {
+    Users.hasMany(models.Courses);
+  }
+  return Users;
 };
