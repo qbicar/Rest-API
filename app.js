@@ -3,7 +3,8 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const routes = require('./routes');
+const courseRoutes = require('./routes/coursesRoute');
+const userRoutes = require('./routes/usersRoute')
 // const fsjs = require()
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -12,26 +13,30 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 const app = express();
 
 app.use(express.json());
-app.use('/api', routes);
-
+app.use('/api', userRoutes);
+app.use('/api', courseRoutes);
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
 // TODO setup your api routes here
 
 // setup a friendly greeting for the root route
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the REST API project!',
   });
 });
 
-// send 404 if no other route matched
-app.use((req, res) => {
+  // send 404 if no other route matched
+
+  app.use((req, res) => {
   res.status(404).json({
     message: 'Route Not Found',
   });
 });
+
+
 
 // setup a global error handler
 app.use((err, req, res, next) => {
