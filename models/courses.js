@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   const Courses = sequelize.define('Courses', {
-    userId: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -26,5 +26,6 @@ module.exports = (sequelize, DataTypes) => {
   Courses.associate = (models) => {
     Courses.belongsTo(models.Users);
   }
+module.exports = Courses;
 return Courses;
 };

@@ -25,5 +25,6 @@ module.exports = (sequelize, DataTypes) => {
   Users.associate = (models) => {
     Users.hasMany(models.Courses);
   }
+  module.exports = Users;
   return Users;
 };
