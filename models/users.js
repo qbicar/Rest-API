@@ -1,5 +1,5 @@
 'use strict';
-const Sequelize = require('sequelize')
+// const Sequelize = require('sequelize')
 
 
 module.exports = (sequelize, DataTypes) => {
@@ -23,8 +23,13 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, { sequelize });
   Users.associate = (models) => {
-    Users.hasMany(models.Courses);
+    Users.hasMany(models.Courses, {
+      as: 'user',
+      foreignKey: {
+        fieldName: 'userId',
+        allowNull: false,
+      },
+    });
   }
-  module.exports = Users;
   return Users;
 };

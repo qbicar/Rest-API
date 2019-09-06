@@ -1,9 +1,8 @@
 'use strict';
-const Sequelize = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   const Courses = sequelize.define('Courses', {
-    id: {
+    userId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -24,8 +23,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, { sequelize });
   Courses.associate = (models) => {
-    Courses.belongsTo(models.Users);
+    Courses.belongsTo(models.Users,{
+      as: 'user',
+      foreignKey: {
+        fieldName: 'userId',
+        allowNull: false,
+      },
+    });
   }
-module.exports = Courses;
 return Courses;
 };
