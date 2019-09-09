@@ -1,8 +1,34 @@
 const express = require('express');
 const router = express.Router();
-// const cData = require('../seed/data.json').courses;
 const Courses = require('../models').Courses;
 const Users= require('../models').Users;
+
+const authenticatedUser = async (req, res, next) => {
+  let message = null;
+  const credentials = auth(req);
+  if (credentials) {
+    const user = await Users.findOne({ where: { emailAddress: credentials.name } });
+    if (user) {
+      const authenticated = bcryptjs
+        .compareSync(credentials.pass, user.password);
+      if (authenticated) {
+        req.currentUser = user;
+      } else {
+        message = `Authentication failure for username: ${user.username}`;
+      }
+    } else {
+      message = `User not found for username: ${credentials.name}`;
+    }
+  } else {
+    message = 'Auth header not found';
+  }
+  if (message) {
+    console.warn(message);
+    res.status(401).json({ message: 'Access Denied' });
+  } else {
+    next();
+  }
+};
 
 function asyncHandler(cb) {
   return async (req, res, next) => {
@@ -39,7 +65,7 @@ router.get('/courses/:id', asyncHandler( async (req, res) => {
  res.json(course)
 }))
 
-router.post('/courses', async (req, res, next) => {
+router.post('/courses', authenticatedUser, async (req, res, next) => {
   try {
     const course = req.body;
     const data = await Courses.create(course)
@@ -59,7 +85,7 @@ return next(error)
   };
 })
 
-router.put('/courses/:id', async (req, res) => {
+router.put('/courses/:id', authenticatedUser, async (req, res) => {
   try {
     const course = await Courses.findByPk(req.params.id)
     if (course) {
@@ -82,12 +108,13 @@ router.put('/courses/:id', async (req, res) => {
 });
 
 
-router.delete('/courses/:id', async (req, res) => {
-    try{const course = await Courses.findByPk(req.params.id)
+router.delete('/courses/:id', authenticatedUser, async (req, res) => {
+    try{
+      const course = await Courses.findByPk(req.params.id)
     if(course){
       await course.destroy();
     }else{
-      res.status(404).json({message: 'oh no'})
+      res.status(404).json({message: 'Error deleting , Please try again'})
     }
     res.status(204).end();
   }catch(error){
