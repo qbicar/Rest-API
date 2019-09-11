@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 
+//<===========check credentials and authentication for each user===================== 
 const authenticatedUser = async (req, res, next) => {
   let message = null;
   const credentials = auth(req);
@@ -19,23 +20,23 @@ const authenticatedUser = async (req, res, next) => {
       if (authenticated) {
         req.currentUser = user;
       } else {
-        message = `Authentication failure for username: ${user.username}`;
+        message = `Authentication failure for username: ${user.emailAddress}}`;
       }
     } else {
-      message = `User not found for username: ${credentials.name}`;
+      message = `User not found for username: ${credentials.emailAddress}}`;
     }
   } else {
     message = 'Auth header not found';
-  }
+  } 
   if (message) {
     console.warn(message);
     res.status(401).json({ message: 'Access Denied' });
-  } else {
+  } else { 
     next();
-  }
+  } 
 };
 
-
+//<==========handles errors in async function ============================
 function asyncHandler(cb) {
   return async (req, res, next) => {
     try {
@@ -45,6 +46,7 @@ function asyncHandler(cb) {
     }
   }
 }
+//<============on /users , user must sign in with credentials and format is returned with user information
 router.get('/users', authenticatedUser, asyncHandler(async (req, res) => {
   const user = req.currentUser;
   res.json(
@@ -52,15 +54,18 @@ router.get('/users', authenticatedUser, asyncHandler(async (req, res) => {
   )
   return res.status(200).end();
 }));
-
+//<===========post user ,creates a new user and hashes their created password to database for security purposes
 router.post('/users', async (req, res) => {
   const user = req.body;
+  if(JSON.stringify(req.body)=== '{}'){
+    res.status(404).json({message: 'Please input a value'})
+  }
   try {
     if (req.body.password) {
       req.body.password = bcryptjs.hashSync(req.body.password)
       await Users.create(user)
     } else {
-      await Users.create(user)
+      res.status(400).end();
     }
     res.location('/').status(201).end();
     res.json({ id: result.id })
