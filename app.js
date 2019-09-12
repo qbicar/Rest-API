@@ -3,6 +3,7 @@
 //<=======load modules============================
 const express = require('express');
 const morgan = require('morgan');
+const Sequelize = require('sequelize');
 const courseRoutes = require('./routes/coursesRoute');
 const userRoutes = require('./routes/usersRoute');
 
@@ -26,6 +27,22 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+
+//<========Test database connection on startup=======
+const sql = new Sequelize({
+  dialect: 'sqlite',
+  storage: 'fsjstd-restapi.db'
+});
+
+const test = sql.authenticate()
+  .then(function () {
+    console.log("CONNECTED! ");
+  })
+  .catch(function (err) {
+    console.log("FAILED");
+  })
+  .done(); 
 
   //<======send 404 if no other route matched=======
 
